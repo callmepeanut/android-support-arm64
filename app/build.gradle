@@ -54,3 +54,47 @@ dependencies {
     // not contains arm64
     implementation(name: 'openDefault-4.2.7', ext: 'aar')
 }
+
+tasks.whenTaskAdded { task ->
+    if (task.name=='mergeDebugNativeLibs') {
+        task.doFirst {
+            println("==========================================================")
+            def v7a = []
+            def arm64 = []
+            it.inputs.files.each { file ->
+                if (file.absolutePath.endsWith("/jni")) {
+//                    println("==========" + file.absolutePath)
+                    if (file.isDirectory()) {
+                        file.listFiles().each { soFileDir ->
+                            if (soFileDir.absolutePath.contains("armeabi-v7a")) {
+                                if (soFileDir.isDirectory()) {
+                                    soFileDir.listFiles().each {
+                                        println(it.absolutePath)
+                                        v7a.add(it.name)
+                                    }
+                                }
+                            }
+                            if (soFileDir.absolutePath.contains("arm64-v8a")) {
+                                if (soFileDir.isDirectory()) {
+                                    soFileDir.listFiles().each {
+                                        println(it.absolutePath)
+                                        arm64.add(it.name)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            println("v7a size: ${v7a.size()}")
+            println("arm64 size: ${arm64.size()}")
+            println("so in v7a, but not in arm64:")
+            v7a.each {
+                if (!arm64.contains(it)) {
+                    println("$it")
+                }
+            }
+            println("==========================================================")
+        }
+    }
+}
