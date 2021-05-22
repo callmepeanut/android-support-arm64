@@ -18,11 +18,11 @@ android {
     }
 
     buildTypes {
-        debug {
-            ndk {
-                abiFilters 'armeabi-v7a', 'arm64-v8a'
-            }
-        }
+//        debug {
+//            ndk {
+//                abiFilters 'armeabi-v7a', 'arm64-v8a'
+//            }
+//        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -34,6 +34,14 @@ android {
     }
     kotlinOptions {
         jvmTarget = '1.8'
+    }
+    splits {
+        abi {
+            enable true
+            reset()
+            include 'armeabi-v7a', 'arm64-v8a'
+            universalApk false
+        }
     }
 }
 
@@ -62,7 +70,7 @@ tasks.whenTaskAdded { task ->
             def v7a = []
             def arm64 = []
             it.inputs.files.each { file ->
-                if (file.absolutePath.endsWith("/jni")) {
+                if (file.absolutePath.endsWith("jni")) {
 //                    println("==========" + file.absolutePath)
                     if (file.isDirectory()) {
                         file.listFiles().each { soFileDir ->
